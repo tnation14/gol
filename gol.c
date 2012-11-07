@@ -8,8 +8,6 @@
 #include <sys/time.h>
 #include <string.h>
 
-#define ROW 4
-#define COL 5
 
 // NOTE: Our code must pass, at minimum, the following criteria:
   // TODO: Error check EVERYTHING that returns a value! (Yeah, everything)
@@ -21,35 +19,42 @@
 // Design suggestion: Create/test code segments in main, move into separate
 //                    functions when complete
 
-int* make2DArray(int rows, int cols);
-void print(int* arr, int willPrint);
+char *make2DArray(int rows, int cols);
+void print(char* arr, int willPrint, int rows, int cols);
 void verifyCmdArgs(int argc, char *argv[]);
-// char readFile(FILE *inFile);
 
 
-int* make2DArray(int rows, int cols){
+char *make2DArray(int rows, int cols){
   // Creates a 2D array by dynamically allocating space for a
-  // 1 x (rows*cols) array
-  int* array = NULL;
-  array = (int *)malloc(sizeof(int)*(rows*cols));
+  // 1 x (rows*cols) char array, initializing all values to -
+  char* array = NULL;
+  array = (char *)malloc(sizeof(char)*(rows*cols));
   if (array == NULL) {
     printf("malloc failed");
     exit(1);
-  } 
+  }
+
+  // Initialize all indices of arrays to "-" to prevent junk data
+  int i = 0;
+  while (i < rows*cols) {
+    array[i] = '-';
+    i++;
+  }
   return array;
 }
 
 
-void print(int* arr, int willPrint) {
+void print(char* arr, int willPrint, int rows, int cols) {
   // Prints arr as a matrix
   if (!willPrint) {
     printf("Not printing board.\n");
     return;
   }
+  
   int i;
-  for (i = 0; i < COL*ROW; i++) {
-    printf("%d ",arr[i]);
-    if (!((i+1) % COL)) {
+  for (i = 0; i < cols*rows; i++) {
+    printf("%c ",arr[i]);
+    if (!((i+1) % cols)) {
       printf("\n");
     }
   }
@@ -75,41 +80,40 @@ void verifyCmdArgs(int argc, char *argv[]) {
   }
 }
 
+FILE *openFile(char *filename[]) {
+  FILE *inFile;
+  inFile = fopen(filename[1],"r");
+  if (inFile == NULL) {
+    printf("Unable to load test parameters.\n");
+    exit(1);
+  } 
+  return inFile;
+}
+
 int main(int argc, char *argv[]) {                                          
   system("clear");
   // Process command line arguments
   verifyCmdArgs(argc, argv);
   
-  // opens test parameter file for reading
-  FILE *inFile;
-  inFile = fopen(argv[1],"r");
-  if (inFile == NULL) {
-    printf("Unable to load test parameters.\n");
-    exit(1);
-  }
-  int *fileParams;  
-  // TODO: Keep this around while I test something else
-  // Simplify this...just change the board directly
-  int rows = 0;
-  int cols = 0;
-  int iters = 0;
-  int numCoords = 0;
-  fscanf(inFile, "%d %d %d %d", &rows, &cols, &iters, &numCoords);
-  char coords[numCoords+1];
+  // Opens test parameter file for reading
+  FILE *inFile = openFile(argv);
+    
+  // Read in data from input file
+  int rows,cols,iters,numCoords,x,y;
   int i = 0;
+  fscanf(inFile, "%d %d %d %d", &rows, &cols, &iters, &numCoords);
   while (i < 2*numCoords-1) {
-    fgets(coords, 4, inFile);
-    fgets(coords, 4, inFile);
-    printf("%c %c\n",coords[i],coords[i+1]);
+    fscanf(inFile,"%d%d",&x,&y);
+    printf("%d %d\n",x,y);
     i+=2;
   }
 
   fclose(inFile);
 
   // Create game board
-  int *board = NULL;
-  board = make2DArray(ROW,COL);
-  print(board,atoi(argv[2]));
+  char *board = NULL;
+  board = make2DArray(rows,cols);
+  print(board,atoi(argv[2]),rows,cols);
   free(board);
 
  
