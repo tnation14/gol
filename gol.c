@@ -8,8 +8,6 @@
 #include <sys/time.h>
 #include <string.h>
 
-#define ROW 4
-#define COL 5
 
 // NOTE: Our code must pass, at minimum, the following criteria:
   // TODO: Error check EVERYTHING that returns a value! (Yeah, everything)
@@ -21,35 +19,50 @@
 // Design suggestion: Create/test code segments in main, move into separate
 //                    functions when complete
 
-int* make2DArray(int rows, int cols);
-void print(int* arr, int willPrint);
+char* make2DArray(int rows, int cols, FILE* file, int numCoords);
+void print(char* arr, int willPrint, int rows, int cols);
 void verifyCmdArgs(int argc, char *argv[]);
-// char readFile(FILE *inFile);
 
 
-int* make2DArray(int rows, int cols){
+char* make2DArray(int rows, int cols, FILE* file, int numCoords){
   // Creates a 2D array by dynamically allocating space for a
   // 1 x (rows*cols) array
-  int* array = NULL;
-  array = (int *)malloc(sizeof(int)*(rows*cols));
+  char* array = NULL;
+  array = (char *)malloc(sizeof(char)*(rows*cols));
   if (array == NULL) {
     printf("malloc failed");
     exit(1);
   } 
+  int i,j,x,y,counter;
+  x = 0;
+  y = 0;
+  counter = 0;
+  
+  for(i = 0; i< rows; i++){
+  	for(j = 0; j< cols; j++){
+  		array[i*rows+j]= '-';
+  	 }	
+  }
+  
+  while(counter < numCoords){
+    fscanf(file, "%d%d", &x,&y);
+	array[x*rows+y]='!';
+	counter++;  				
+  }	
   return array;
 }
 
 
-void print(int* arr, int willPrint) {
+void print(char* arr, int willPrint,int rows,int cols) {
   // Prints arr as a matrix
   if (!willPrint) {
     printf("Not printing board.\n");
     return;
   }
   int i;
-  for (i = 0; i < COL*ROW; i++) {
-    printf("%d ",arr[i]);
-    if (!((i+1) % COL)) {
+  for (i = 0; i < rows*cols; i++) {
+    printf("%c ",arr[i]);
+    if (!((i+1) % cols)) {
       printf("\n");
     }
   }
@@ -89,23 +102,20 @@ int main(int argc, char *argv[]) {
   }
     
   // TODO: Keep this around while I test something else
-  int rows,cols,iters,numCoords,x,y;
+  int rows,cols,iters,numCoords;
   fscanf(inFile, "%d %d %d %d", &rows, &cols, &iters, &numCoords);
-  int i = 0;
-  while (i < 2*numCoords-1) {
-    fscanf(inFile,"%d%d",&x,&y);
-    printf("%d %d\n",x,y);
-    i+=2;
-  }
+  
 
-  fclose(inFile);
+
 
   // Create game board
-  int *board = NULL;
-  board = make2DArray(ROW,COL);
-  print(board,atoi(argv[2]));
+  char *board = NULL;
+  board = make2DArray(rows,cols,inFile,numCoords);
+  print(board,atoi(argv[2]),rows,cols);
+  
+  
   free(board);
-
+  fclose(inFile);
  
   return 0;
 }
