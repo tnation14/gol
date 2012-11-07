@@ -87,20 +87,14 @@ int main(int argc, char *argv[]) {
     printf("Unable to load test parameters.\n");
     exit(1);
   }
-  int *fileParams;  
+    
   // TODO: Keep this around while I test something else
-  // Simplify this...just change the board directly
-  int rows = 0;
-  int cols = 0;
-  int iters = 0;
-  int numCoords = 0;
+  int rows,cols,iters,numCoords,x,y;
   fscanf(inFile, "%d %d %d %d", &rows, &cols, &iters, &numCoords);
-  char coords[numCoords+1];
   int i = 0;
   while (i < 2*numCoords-1) {
-    fgets(coords, 4, inFile);
-    fgets(coords, 4, inFile);
-    printf("%c %c\n",coords[i],coords[i+1]);
+    fscanf(inFile,"%d%d",&x,&y);
+    printf("%d %d\n",x,y);
     i+=2;
   }
 
