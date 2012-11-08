@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <string.h>
-
+//remove me.
 
 // NOTE: Our code must pass, at minimum, the following criteria:
   // TODO: Error check EVERYTHING that returns a value! (Yeah, everything)
@@ -19,40 +19,48 @@
 // Design suggestion: Create/test code segments in main, move into separate
 //                    functions when complete
 
-char *make2DArray(int rows, int cols);
+char* make2DArray(int rows, int cols, FILE* file, int numCoords);
 void print(char* arr, int willPrint, int rows, int cols);
 void verifyCmdArgs(int argc, char *argv[]);
+int numNeighbors(int xcoord, int ycoord, int rows, int cols, char *board, int numcoords);
 
-
-char *make2DArray(int rows, int cols){
+char* make2DArray(int rows, int cols, FILE* file, int numCoords){
   // Creates a 2D array by dynamically allocating space for a
-  // 1 x (rows*cols) char array, initializing all values to -
+  // 1 x (rows*cols) array
   char* array = NULL;
   array = (char *)malloc(sizeof(char)*(rows*cols));
   if (array == NULL) {
     printf("malloc failed");
     exit(1);
+  } 
+  int i,j,x,y,counter;
+  x = 0;
+  y = 0;
+  counter = 0;
+  
+  for(i = 0; i< rows; i++){
+  	for(j = 0; j< cols; j++){
+  		array[i*rows+j]= '-';
+  	 }	
   }
-
-  // Initialize all indices of arrays to "-" to prevent junk data
-  int i = 0;
-  while (i < rows*cols) {
-    array[i] = '-';
-    i++;
-  }
+  
+  while(counter < numCoords){
+    fscanf(file, "%d%d", &x,&y);
+	array[x*rows+y]='!';
+	counter++;  				
+  }	
   return array;
 }
 
 
-void print(char* arr, int willPrint, int rows, int cols) {
+void print(char* arr, int willPrint,int rows,int cols) {
   // Prints arr as a matrix
   if (!willPrint) {
     printf("Not printing board.\n");
     return;
   }
-  
   int i;
-  for (i = 0; i < cols*rows; i++) {
+  for (i = 0; i < rows*cols; i++) {
     printf("%c ",arr[i]);
     if (!((i+1) % cols)) {
       printf("\n");
@@ -80,42 +88,68 @@ void verifyCmdArgs(int argc, char *argv[]) {
   }
 }
 
-FILE *openFile(char *filename[]) {
-  FILE *inFile;
-  inFile = fopen(filename[1],"r");
-  if (inFile == NULL) {
-    printf("Unable to load test parameters.\n");
-    exit(1);
-  } 
-  return inFile;
-}
+int numNeighbors(int xcoord, int ycoord, int rows, int cols, char *board, int numcoords){
+  int neighborcounter, i, j, k, x, y;  
+  /*
+  0 1 2 3 4 5
+  */
+  x = xcoord;
+  y = ycoord;
+  
+  for(i = 0; i < 2* numcoords-1; i +=2){
+  	for(j = -1; i< 2; k++){
+  	int currentrow;
+  	currentrow = x+j;
+  	if(currentrow == rows){
+  	  currentrow = 0;	  
+  	}
+  	for(k = -1;j<2;j++){
+  	  int currentcol;
+  	  currentcol = y +k;
+  	  if(currentcol == cols){
+  	  	currentcol = 0;
+  	  }  	  
+  	  if(currentrow == x && currentcol == y){
+  	    continue;
+  	  }else if(board[currentrow*rows+currentcol] == '!'){
+  	    neighborcounter++;
+  	  }
 
+  	}
+  }
+  }
+  
+
+
+  printf("(%d,%d) has %d live neighbors.\n",x,y,neighborcounter);
+  return neighborcounter;
+  }
 int main(int argc, char *argv[]) {                                          
   system("clear");
   // Process command line arguments
   verifyCmdArgs(argc, argv);
   
-  // Opens test parameter file for reading
-  FILE *inFile = openFile(argv);
-    
-  // Read in data from input file
-  int rows,cols,iters,numCoords,x,y;
-  int i = 0;
-  fscanf(inFile, "%d %d %d %d", &rows, &cols, &iters, &numCoords);
-  while (i < 2*numCoords-1) {
-    fscanf(inFile,"%d%d",&x,&y);
-    printf("%d %d\n",x,y);
-    i+=2;
+  // opens test parameter file for reading
+  FILE *inFile;
+  inFile = fopen(argv[1],"r");
+  if (inFile == NULL) {
+    printf("Unable to load test parameters.\n");
+    exit(1);
   }
-
-  fclose(inFile);
-
+    
+  // TODO: Keep this around while I test something else
+  int rows,cols,iters,numCoords,counter,x,y,i,j;
+  fscanf(inFile, "%d %d %d %d", &rows, &cols, &iters, &numCoords);
+  
   // Create game board
   char *board = NULL;
-  board = make2DArray(rows,cols);
+  board = make2DArray(rows,cols,inFile,numCoords);
   print(board,atoi(argv[2]),rows,cols);
+  
+ 
+  
   free(board);
-
+  fclose(inFile);
  
   return 0;
 }
