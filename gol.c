@@ -96,21 +96,26 @@ int numNeighbors(int xcoord, int ycoord, int rows, int cols, char *board, int nu
   y = ycoord;
   neighborcounter = 0;
   	for(j = -1; j< 2; j++){
-  		int currentrow;
-  		currentrow = x+j;
-  		if(currentrow == rows){
-  	  	  currentrow = 0;  	  
-  		}
+          int currentrow;
+          currentrow = x+j;
+          if(currentrow == rows){
+            currentrow = 0;  	  
+          }else if(currentrow ==-1){
+            currentrow = rows-1;
+          }
+
   	  for(k = -1;k<2;k++){
   	    int currentcol;
   	    currentcol = y +k;
   	    if(currentcol == cols){
   	    	currentcol = 0;
-  	    }  	  
+  	    }else if(currentcol == -1){
+              currentcol = cols-1;
+            }  	  
   	    if(currentrow == x && currentcol == y){
   	      continue;
   	    }else if(board[currentrow*rows+currentcol] == '!'){
-  	  	  printf("Neighbor: (%d,%d)\n", currentrow, currentcol);
+                printf("Neighbor: (%d,%d)\n", currentrow, currentcol);
   	      neighborcounter++;
   	    }
 
@@ -163,7 +168,8 @@ int main(int argc, char *argv[]) {
   for(counter = 0; counter <2*numCoords-1; counter+=2){
   	int neighbors;
   	printf("(%d,%d)\n",coords[counter], coords[counter+1]);
-  	neighbors = numNeighbors(coords[counter],coords[counter+1],rows,cols,board,numCoords);
+  	neighbors = numNeighbors(coords[counter],coords[counter+1],rows,cols,
+            board,numCoords);
   	
   }
  
