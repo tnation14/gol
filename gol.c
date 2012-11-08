@@ -22,7 +22,7 @@
 char* make2DArray(int rows, int cols, FILE* file, int numCoords);
 void print(char* arr, int willPrint, int rows, int cols);
 void verifyCmdArgs(int argc, char *argv[]);
-
+int numNeighbors(int xcoord, int ycoord, int rows, int cols, char *board, int numcoords);
 
 char* make2DArray(int rows, int cols, FILE* file, int numCoords){
   // Creates a 2D array by dynamically allocating space for a
@@ -88,6 +88,42 @@ void verifyCmdArgs(int argc, char *argv[]) {
   }
 }
 
+int numNeighbors(int xcoord, int ycoord, int rows, int cols, char *board, int numcoords){
+  int neighborcounter, i, j, k, x, y;  
+  /*
+  0 1 2 3 4 5
+  */
+  x = xcoord;
+  y = ycoord;
+  
+  for(i = 0; i < 2* numcoords-1; i +=2){
+  	for(j = -1; i< 2; k++){
+  	int currentrow;
+  	currentrow = x+j;
+  	if(currentrow == rows){
+  	  currentrow = 0;	  
+  	}
+  	for(k = -1;j<2;j++){
+  	  int currentcol;
+  	  currentcol = y +k;
+  	  if(currentcol == cols){
+  	  	currentcol = 0;
+  	  }  	  
+  	  if(currentrow == x && currentcol == y){
+  	    continue;
+  	  }else if(board[currentrow*rows+currentcol] == '!'){
+  	    neighborcounter++;
+  	  }
+
+  	}
+  }
+  }
+  
+
+
+  printf("(%d,%d) has %d live neighbors.\n",x,y,neighborcounter);
+  return neighborcounter;
+  }
 int main(int argc, char *argv[]) {                                          
   system("clear");
   // Process command line arguments
@@ -102,17 +138,15 @@ int main(int argc, char *argv[]) {
   }
     
   // TODO: Keep this around while I test something else
-  int rows,cols,iters,numCoords;
+  int rows,cols,iters,numCoords,counter,x,y,i,j;
   fscanf(inFile, "%d %d %d %d", &rows, &cols, &iters, &numCoords);
   
-
-
-
   // Create game board
   char *board = NULL;
   board = make2DArray(rows,cols,inFile,numCoords);
   print(board,atoi(argv[2]),rows,cols);
   
+ 
   
   free(board);
   fclose(inFile);
