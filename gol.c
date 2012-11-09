@@ -199,7 +199,6 @@ int main(int argc, char *argv[]) {
 
   free(board);
   fclose(inFile);
-  free(infile);
  
   return 0;
 }
