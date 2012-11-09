@@ -37,12 +37,15 @@ char* make2DArray(int rows, int cols, FILE* file, int numCoords){
   y = 0;
   counter = 0;
   
+  // Sets every value to '-'.
   for(i = 0; i< rows; i++){
   	for(j = 0; j< cols; j++){
   		array[i*rows+j]= '-';
   	 }	
   }
   
+  // Reads config file, makes any coords in that file '!' to indicate
+  // That they're active. 
   while(counter < numCoords){
     fscanf(file, "%d%d", &x,&y);
 	array[x*rows+y]='!';
@@ -88,16 +91,27 @@ void verifyCmdArgs(int argc, char *argv[]) {
 }
 
 int numNeighbors(int xcoord, int ycoord, int rows, int cols, char *board, int numcoords){
+  /* Counts the number of neighbors */
   int neighborcounter, i, j, k, x, y;  
-  /*
-  0 1 2 3 4 5
-  */
+
   x = xcoord;
   y = ycoord;
   neighborcounter = 0;
+  
+  
   for(j = -1; j< 2; j++){
+  
+    /* Sets the row we're searching for live neighbors in.
+       starts at the cell to the top left, or wraps arount
+       if necessary. Checks every cell in a row (again
+       wrapping to the other side if necessary), and 
+       increments the counter by 1 if the cell is active.
+    */
     int currentrow;
     currentrow = x+j;
+    
+    // Wraps other side of game board if the current row is too big or too
+    // small.
     if(currentrow == rows){
       currentrow = 0;  	  
     }else if(currentrow ==-1){
@@ -107,14 +121,19 @@ int numNeighbors(int xcoord, int ycoord, int rows, int cols, char *board, int nu
     for(k = -1;k<2;k++){
       int currentcol;
       currentcol = y +k;
+      
+      // Wrapping for columns.
       if(currentcol == cols){
           currentcol = 0;
       }else if(currentcol == -1){
         currentcol = cols-1;
       }  	  
       if(currentrow == x && currentcol == y){
+      
+        //avoids a cell counting itself as a neighbor.
         continue;
       }else if(board[currentrow*rows+currentcol] == '!'){
+      	  // If a cell's value is '!', it's alive. Increment the counter.
           printf("Neighbor: (%d,%d)\n", currentrow, currentcol);
         neighborcounter++;
       }
@@ -140,7 +159,7 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
     
-  // TODO: Keep this around while I test something else
+  //Reads maze information from configuration file. 
   int rows,cols,iters,numCoords,counter,x,y,neighbors;
   fscanf(inFile, "%d %d %d %d", &rows, &cols, &iters, &numCoords);
   
@@ -148,43 +167,18 @@ int main(int argc, char *argv[]) {
   char *board = NULL;
   board = make2DArray(rows,cols,inFile,numCoords);
   print(board,atoi(argv[2]),rows,cols);
-  int* coords=NULL;
-  coords = (int *)malloc(8*sizeof(int));
-  if (coords == NULL) {
-    printf("malloc failed");
-    exit(1);
-  } 
- /* counter = 0;
-  int index;
-  index = 0;
-  fseek(inFile, 0, SEEK_SET);
-  fscanf(inFile, "%d %d %d %d", &rows, &cols, &iters, &numCoords);
 
-  while(counter < numCoords){
-  	fscanf(inFile, "%d %d", &coords[index],&coords[index+1]);	
-  	index +=2;
-  	counter ++;
-  } 
-  for(counter = 0; counter <2*numCoords-1; counter+=2){
-  	int neighbors;
-  	printf("(%d,%d)\n",coords[counter], coords[counter+1]);
-  	neighbors = numNeighbors(coords[counter],coords[counter+1],rows,cols,
-            board,numCoords);
-        if(neighbors <2){
-          x = coords[counter];
-          y = coords[counter+1];
-          board[x*rows+y] = '-';
-        }else if(neighbors==){}
 
-  	
-  }
- 
-  */
+  /*Slow, but works: iterates every element in the array, and checks its
+    neighbors. If a cell has < 2 neighbors, it dies. More than 3 also dies.
+    Exactly 3 neighbors brings the cell to life.
+	*/
 
   for(x = 0; x < rows; x++){
     for(y = 0; y<cols; y++){
        neighbors = numNeighbors(x,y,rows,cols,board,numCoords);
        if(neighbors <2){
+         //resets and redraws board
          board[x*rows+y]= '-';
          system("clear");
          print(board,atoi(argv[2]),rows,cols);
@@ -204,8 +198,8 @@ int main(int argc, char *argv[]) {
   }
 
   free(board);
-  free(coords);
   fclose(inFile);
+  free(infile);
  
   return 0;
 }
