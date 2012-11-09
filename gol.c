@@ -95,31 +95,31 @@ int numNeighbors(int xcoord, int ycoord, int rows, int cols, char *board, int nu
   x = xcoord;
   y = ycoord;
   neighborcounter = 0;
-  	for(j = -1; j< 2; j++){
-          int currentrow;
-          currentrow = x+j;
-          if(currentrow == rows){
-            currentrow = 0;  	  
-          }else if(currentrow ==-1){
-            currentrow = rows-1;
-          }
+  for(j = -1; j< 2; j++){
+    int currentrow;
+    currentrow = x+j;
+    if(currentrow == rows){
+      currentrow = 0;  	  
+    }else if(currentrow ==-1){
+      currentrow = rows-1;
+    }
 
-  	  for(k = -1;k<2;k++){
-  	    int currentcol;
-  	    currentcol = y +k;
-  	    if(currentcol == cols){
-  	    	currentcol = 0;
-  	    }else if(currentcol == -1){
-              currentcol = cols-1;
-            }  	  
-  	    if(currentrow == x && currentcol == y){
-  	      continue;
-  	    }else if(board[currentrow*rows+currentcol] == '!'){
-                printf("Neighbor: (%d,%d)\n", currentrow, currentcol);
-  	      neighborcounter++;
-  	    }
+    for(k = -1;k<2;k++){
+      int currentcol;
+      currentcol = y +k;
+      if(currentcol == cols){
+          currentcol = 0;
+      }else if(currentcol == -1){
+        currentcol = cols-1;
+      }  	  
+      if(currentrow == x && currentcol == y){
+        continue;
+      }else if(board[currentrow*rows+currentcol] == '!'){
+          printf("Neighbor: (%d,%d)\n", currentrow, currentcol);
+        neighborcounter++;
+      }
 
-  	}
+  }
   }
   
 
@@ -141,7 +141,7 @@ int main(int argc, char *argv[]) {
   }
     
   // TODO: Keep this around while I test something else
-  int rows,cols,iters,numCoords,counter,x,y;
+  int rows,cols,iters,numCoords,counter,x,y,neighbors;
   fscanf(inFile, "%d %d %d %d", &rows, &cols, &iters, &numCoords);
   
   // Create game board
@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
     printf("malloc failed");
     exit(1);
   } 
-  counter = 0;
+ /* counter = 0;
   int index;
   index = 0;
   fseek(inFile, 0, SEEK_SET);
@@ -170,10 +170,39 @@ int main(int argc, char *argv[]) {
   	printf("(%d,%d)\n",coords[counter], coords[counter+1]);
   	neighbors = numNeighbors(coords[counter],coords[counter+1],rows,cols,
             board,numCoords);
+        if(neighbors <2){
+          x = coords[counter];
+          y = coords[counter+1];
+          board[x*rows+y] = '-';
+        }else if(neighbors==){}
+
   	
   }
  
-  
+  */
+
+  for(x = 0; x < rows; x++){
+    for(y = 0; y<cols; y++){
+       neighbors = numNeighbors(x,y,rows,cols,board,numCoords);
+       if(neighbors <2){
+         board[x*rows+y]= '-';
+         system("clear");
+         print(board,atoi(argv[2]),rows,cols);
+         usleep(200000);
+       }else if(neighbors>3){
+         system("clear");
+         board[x*rows+y] = '-';
+         print(board,atoi(argv[2]),rows,cols);
+         usleep(200000);
+       }else if(neighbors == 3){
+         system("clear");
+         board[x*rows+y] = '!';
+         print(board,atoi(argv[2]),rows,cols);
+         usleep(200000);
+       }
+    }
+  }
+
   free(board);
   free(coords);
   fclose(inFile);
